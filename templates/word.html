@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="main-card">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fst-italic m-0" style="color: #ff6ca1; font-family: 'Cambria', serif;">Kho từ vựng của tôi</h2>
+        <a href="/add" class="btn btn-cute text-white shadow-sm" style="background-color: #79d279;"><i class="bi bi-plus-lg"></i> Thêm từ mới</a>
+    </div>
+    
+    <div class="card border-0 shadow-sm p-4 rounded-4 mb-4" style="background-color: #ffffff;">
+        <h5 class="fw-bold mb-3" style="color: #3b4e85;"><i class="bi bi-tags-fill"></i> Chọn bảng từ vựng ngôn ngữ:</h5>
+        <div class="d-flex flex-wrap gap-3">
+            {% for lang in languages %}
+                <div class="btn-group shadow-sm rounded-pill overflow-hidden bg-white p-1" style="border: 2px solid #3b4e85;">
+                    {% if selected_lang == lang %}
+                        <a href="/word?lang={{ lang }}" class="btn btn-sm px-3 border-0 rounded-pill fw-bold text-white" style="background-color: #5369b2;">
+                            Bảng {{ lang }}
+                        </a>
+                    {% else %}
+                        <a href="/word?lang={{ lang }}" class="btn btn-sm px-3 border-0 rounded-pill fw-bold text-secondary bg-transparent">
+                            Bảng {{ lang }}
+                        </a>
+                    {% endif %}
+                    
+                    <a href="/delete_language/{{ lang }}" class="btn btn-sm border-0 bg-transparent text-danger px-2 ms-1" onclick="return confirm('Xóa toàn bộ bảng?')">
+                        <i class="bi bi-trash3-fill"></i>
+                    </a>
+                </div>
+            {% else %}
+                <p class="text-muted mb-0 fst-italic">Hệ thống trống. Hãy bấm thêm từ mới ở góc trên.</p>
+            {% endfor %}
+        </div>
+    </div>
+
+    {% if selected_lang %}
+        <hr style="border-color: #ffd1dc;">
+        <div class="d-flex justify-content-between align-items-center my-4">
+            <h3 class="fst-italic" style="color: #3b4e85;"><i class="bi bi-folder2-open"></i> Phân loại: {{ selected_lang }}</h3>
+            <a href="/flashcard/{{ selected_lang }}" class="btn btn-cute text-white shadow-sm" style="background-color: #ff6ca1;"><i class="bi bi-layers-half"></i> Học Flashcard</a>
+        </div>
+
+        <form method="GET" action="/word" class="mb-4">
+            <input type="hidden" name="lang" value="{{ selected_lang }}">
+            <div class="input-group shadow-sm rounded-pill overflow-hidden bg-white p-1" style="border: 1px solid #dee2e6;">
+                <input type="text" name="keyword" class="form-control border-0 bg-transparent px-3" placeholder="Tìm kiếm từ hoặc nghĩa trong bảng này..." value="{{ keyword }}">
+                <button class="btn btn-cute text-white px-4 rounded-pill" type="submit" style="background-color: #5369b2;">Tìm kiếm</button>
+            </div>
+        </form>
+
+        <div class="table-responsive bg-white rounded-4 shadow-sm p-3">
+            <table class="table table-hover align-middle mb-0">
+                <thead>
+                    <tr style="color: #3b4e85; border-bottom: 2px solid #ffd1dc;">
+                        <th>Từ vựng (Phiên âm)</th>
+                        <th>Loại từ</th>
+                        <th>Ý nghĩa</th>
+                        <th>Ví dụ minh họa (Ngoại ngữ / Tiếng Việt)</th>
+                        <th class="text-center" style="width: 15%;">Tình trạng</th>
+                        <th class="text-center" style="width: 15%;">Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for w in word %}
+                    <tr style="border-bottom: 1px solid #fcf9ee;">
+                        <td>
+                            <span class="fw-bold text-dark fs-5">{{ w.word }}</span>
+                            {% if w.pronunciation %}<div class="text-muted small fst-italic">{{ w.pronunciation }}</div>{% endif %}
+                        </td>
+                        <td><span class="badge rounded-pill pt-2 px-3 pb-1" style="background-color: #e2e8f0; color: #4a5568;">{{ w.word_type }}</span></td>
+                        <td class="fw-bold" style="color: #5369b2;">{{ w.meaning }}</td>
+                        <td>
+                            {% if w.example_foreign %}
+                                <div class="text-primary small fw-bold">📌 {{ w.example_foreign }}</div>
+                                <div class="text-muted small ps-3">↳ {{ w.example_vietnamese }}</div>
+                            {% else %}
+                                <span class="text-muted small fst-italic">Chưa có ví dụ</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-center">
+                            {% if w.is_memorized %}
+                                <button class="btn btn-cute btn-sm toggle-status-btn text-white" data-id="{{ w.id }}" style="background-color: #79d279; font-size: 0.85rem;">
+                                    <i class="bi bi-check-circle-fill"></i> Đã thuộc
+                                </button>
+                            {% else %}
+                                <button class="btn btn-cute btn-sm toggle-status-btn text-dark" data-id="{{ w.id }}" style="background-color: #f5f878; font-size: 0.85rem;">
+                                    <i class="bi bi-exclamation-circle-fill"></i> Chưa thuộc
+                                </button>
+                            {% endif %}
+                        </td>
+                        <td class="text-center">
+                            <a href="/edit/{{ w.id }}" class="btn btn-sm btn-light text-warning me-1 rounded-circle"><i class="bi bi-pencil-square"></i></a>
+                            <a href="/delete/{{ w.id }}" class="btn btn-sm btn-light text-danger rounded-circle" onclick="return confirm('Xóa từ này?')"><i class="bi bi-trash-fill"></i></a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% endif %}
+</div>
+
+<script>
+document.querySelectorAll('.toggle-status-btn').forEach(button => {
+    button.addEventListener('click', function() {
+        const wordId = this.getAttribute('data-id');
+        fetch(`/toggle_memorized/${wordId}`, { method: 'POST' })
+        .then(response => response.json())
+        .then(data => {
+            if(data.status === 'success') {
+                if(data.is_memorized) {
+                    this.style.backgroundColor = "#79d279";
+                    this.style.color = "#ffffff";
+                    this.innerHTML = '<i class="bi bi-check-circle-fill"></i> Đã thuộc';
+                } else {
+                    // 5) Đổi màu trạng thái động thành vàng chanh khi click chuột
+                    this.style.backgroundColor = "#f5f878";
+                    this.style.color = "#000000";
+                    this.innerHTML = '<i class="bi bi-exclamation-circle-fill"></i> Chưa thuộc';
+                }
+            }
+        });
+    });
+});
+</script>
+{% endblock %}

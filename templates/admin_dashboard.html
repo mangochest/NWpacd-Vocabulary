@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="main-card">
+    
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fst-italic m-0 fw-bold" style="color: #3b4e85;">
+            🛡️ Quản lý tài khoản thành viên
+        </h2>
+        <span class="badge rounded-pill px-3 py-2 fs-6" style="background-color: #3b4e85; color: #ffffff;">
+            Tổng số: {{ users|length }} thành viên
+        </span>
+    </div>
+
+    <!-- BẢNG DANH SÁCH THÀNH VIÊN ĐÃ ĐƯỢC CĂN GIỮA CHỮ TRONG NÚT -->
+    <div class="table-responsive rounded-4 shadow-sm p-3" style="background-color: #fcf9ee; border: 2px solid #79d279;">
+        <table class="table table-hover align-middle mb-0 bg-transparent">
+            <thead>
+                <tr style="color: #ffffff; background-color: #79d279;">
+                    <th class="ps-3 py-3" style="width: 8%; border-top-left-radius: 15px; border-bottom-left-radius: 15px;">ID</th>
+                    <th class="py-3" style="width: 17%;">Tên người dùng</th>
+                    <th class="py-3" style="width: 22%;">Địa chỉ Email</th>
+                    <th class="py-3" style="width: 13%;">Quyền hạn</th>
+                    <th class="text-center py-3" style="width: 40%; border-top-right-radius: 15px; border-bottom-right-radius: 15px;">Thao tác quản trị</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for u in users %}
+                <tr style="border-bottom: 1px solid #ffd1dc;">
+                    <td class="ps-3 text-muted fw-bold">#{{ u.id }}</td>
+                    <td class="fw-bold" style="color: #3b4e85;">{{ u.username }}</td>
+                    <td class="text-secondary">{{ u.email }}</td>
+                    
+                    <td>
+                        {% if u.role == 'admin' %}
+                            <span class="badge rounded-pill px-3 py-1 text-uppercase text-white" style="background-color: #ff6ca1; font-size: 0.75rem; letter-spacing: 1px;">
+                                Admin
+                            </span>
+                        {% else %}
+                            <span class="badge rounded-pill px-3 py-1 text-uppercase text-white" style="background-color: #3b4e85; font-size: 0.75rem; letter-spacing: 1px;">
+                                User
+                            </span>
+                        {% endif %}
+                    </td>
+                    
+                    <td class="text-center">
+                        <div class="d-flex justify-content-center align-items-center gap-2">
+                            
+                            <!-- Đmax SỬA: Thêm d-inline-flex, justify-content-center và căn chỉnh lại độ rộng (width) hợp lý hơn -->
+                            {% if u.role != 'admin' %}
+                                <a href="/admin/promote_user/{{ u.id }}" class="btn btn-sm btn-cute text-white d-inline-flex justify-content-center align-items-center" style="background-color: #79d279; font-size: 0.85rem; width: 135px; white-space: nowrap;" onclick="return confirm('Cấp quyền Admin cho tài khoản này?')">
+                                    ⭐ Lên Admin
+                                </a>
+                            {% else %}
+                                <div style="width: 135px;"></div>
+                            {% endif %}
+
+                            <a href="/admin/reset_user/{{ u.id }}" class="btn btn-sm btn-cute btn-outline-secondary d-inline-flex justify-content-center align-items-center" style="font-size: 0.85rem; border: 1px solid #3b4e85; color: #3b4e85; width: 195px; white-space: nowrap;" onclick="return confirm('Reset mật khẩu về mặc định?')">
+                                🔄 Cấp lại mật khẩu
+                            </a>
+                            
+                            <a href="/admin/delete_user/{{ u.id }}" class="btn btn-sm btn-cute text-white d-inline-flex justify-content-center align-items-center" style="background-color: #ff6ca1; font-size: 0.85rem; width: 165px; white-space: nowrap;" onclick="return confirm('Xóa vĩnh viễn tài khoản?')">
+                                ❌ Xóa tài khoản
+                            </a>
+                            
+                        </div>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="5" class="text-center text-muted py-4 fst-italic">Chưa có thành viên nào đăng ký hệ thống!</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    
+</div>
+{% endblock %}

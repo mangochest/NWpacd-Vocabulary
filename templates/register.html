@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="main-card mx-auto" style="max-width: 500px; min-height: auto;">
+    <h2 class="text-center mb-4 fst-italic" style="color: #ff6ca1; font-family: 'Georgia', serif;">Đăng ký tài khoản</h2>
+    <form method="POST">
+        <div class="mb-3">
+            <label class="form-label fw-bold" style="color: #3b4e85;">Tên đăng nhập</label>
+            <input type="text" name="username" class="form-control rounded-pill border-secondary-subtle px-3" style="background-color: #fffdec;" required>
+        </div>
+        <div class="mb-3">
+            <label class="form-label fw-bold" style="color: #3b4e85;">Email</label>
+            <input type="email" name="email" class="form-control rounded-pill border-secondary-subtle px-3" style="background-color: #fffdec;" required>
+        </div>
+        <div class="mb-4">
+            <label class="form-label fw-bold" style="color: #3b4e85;">Mật khẩu</label>
+            <input type="password" name="password" class="form-control rounded-pill border-secondary-subtle px-3" style="background-color: #fffdec;" required>
+        </div>
+        <button type="submit" class="btn btn-cute w-100 text-white fs-5" style="background-color: #79d279;">
+            Đăng ký
+        </button>
+    </form>
+</div>
+{% endblock %}

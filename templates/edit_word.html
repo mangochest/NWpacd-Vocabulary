@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="main-card mx-auto" style="max-width: 750px;">
+    <h2 class="mb-4 fst-italic" style="color: #f9b863; font-family: 'Georgia', serif;">Chỉnh sửa từ vựng</h2>
+    <form method="POST">
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label class="form-label fw-bold" style="color: #3b4e85;">Từ vựng</label>
+                <input type="text" name="word" class="form-control rounded-pill border-secondary-subtle px-3" value="{{ word.word }}" required>
+            </div>
+            <div class="col-md-6 mb-3">
+                <label class="form-label fw-bold" style="color: #3b4e85;">Phiên âm</label>
+                <input type="text" name="pronunciation" class="form-control rounded-pill border-secondary-subtle px-3" value="{{ word.pronunciation if word.pronunciation else '' }}">
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label class="form-label fw-bold" style="color: #3b4e85;">Loại từ</label>
+                <select name="word_type" class="form-select rounded-pill border-secondary-subtle px-3">
+                    <option value="Danh từ" {% if word.word_type == 'Danh từ' %}selected{% endif %}>Danh từ (n)</option>
+                    <option value="Động từ" {% if word.word_type == 'Động từ' %}selected{% endif %}>Động từ (v)</option>
+                    <option value="Tính từ" {% if word.word_type == 'Tính từ' %}selected{% endif %}>Tính từ (adj)</option>
+                    <option value="Trạng từ" {% if word.word_type == 'Trạng từ' %}selected{% endif %}>Trạng từ (adv)</option>
+                    <option value="Giới từ" {% if word.word_type == 'Giới từ' %}selected{% endif %}>Giới từ (prep)</option>
+                </select>
+            </div>
+            <div class="col-md-6 mb-3">
+                <label class="form-label fw-bold" style="color: #3b4e85;">Ngôn ngữ</label>
+                <input type="text" name="language" class="form-control rounded-pill border-secondary-subtle px-3" value="{{ word.language }}" required>
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label fw-bold" style="color: #3b4e85;">Ý nghĩa</label>
+            <input type="text" name="meaning" class="form-control rounded-pill border-secondary-subtle px-3" value="{{ word.meaning }}" required>
+        </div>
+
+        <div class="card p-3 mb-4 border-0 shadow-sm rounded-4" style="background-color: #fffdec;">
+            <span class="fw-bold mb-2" style="color: #f9b863;"><i class="bi bi-bookmark-star-fill"></i> Cột ví dụ minh họa</span>
+            <div class="row">
+                <div class="col-md-6 mb-2">
+                    <label class="form-label text-muted small fw-bold">Ngoại ngữ</label>
+                    <textarea name="example_foreign" class="form-control rounded-3 border-secondary-subtle" rows="2">{{ word.example_foreign if word.example_foreign else '' }}</textarea>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label text-muted small fw-bold">Tiếng Việt (Dịch nghĩa)</label>
+                    <textarea name="example_vietnamese" class="form-control rounded-3 border-secondary-subtle" rows="2">{{ word.example_vietnamese if word.example_vietnamese else '' }}</textarea>
+                </div>
+            </div>
+        </div>
+
+        <div class="d-flex justify-content-between">
+            <a href="/word?lang={{ word.language }}" class="btn btn-cute btn-outline-secondary px-4">Hủy thao tác</a>
+            <button type="submit" class="btn btn-cute text-dark px-4 fw-bold" style="background-color: #f9b863;">Cập nhật từ</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

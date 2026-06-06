@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="main-card text-center d-flex flex-column align-items-center justify-content-center">
+    <h2 class="mb-2 fst-italic" style="color: #ff6ca1; font-family: 'Cambria', serif;">Học Flashcard: {{ lang }}</h2>
+    <p class="text-muted">Click chuột trực tiếp vào giữa thẻ để xoay lật xem thông tin chi tiết</p>
+    
+    <div class="my-4 d-flex justify-content-center w-100">
+        <div class="flashcard-container" onclick="this.classList.toggle('flipped')">
+            <div class="flashcard-inner">
+                
+                <div class="flashcard-front d-flex flex-column align-items-center justify-content-center shadow rounded-5 border-0 bg-white">
+                    <span id="card-type" class="badge rounded-pill px-3 py-1 bg-secondary-subtle text-secondary mb-3">Loại từ</span>
+                    <h1 id="word-display" class="m-0 display-4 fw-bold" style="color: #5369b2;">Từ vựng</h1>
+                    <h5 id="pron-display" class="text-muted mt-3 fst-italic">/Phiên âm/</h5>
+                </div>
+                
+                <div class="flashcard-back d-flex flex-column align-items-center justify-content-center shadow rounded-5 border-0 p-4" style="background-color: #fffdec;">
+                    <h2 id="meaning-display" class="fw-bold mb-4" style="color: #79d279;">Ý nghĩa</h2>
+                    <div class="w-100 border-top pt-3 text-start" style="border-color: #ffd1dc !important;">
+                        <div class="row px-2">
+                            <div class="col-6 border-end" style="border-color: #ffd1dc !important;">
+                                <strong class="small d-block mb-1" style="color: #5369b2;"><i class="bi bi-translate"></i> Ngoại ngữ:</strong>
+                                <p id="ex-foreign-display" class="small fst-italic text-secondary m-0">Ví dụ câu mẫu</p>
+                            </div>
+                            <div class="col-6">
+                                <strong class="small d-block mb-1" style="color: #ff6ca1;"><i class="bi bi-chat-right-text"></i> Tiếng Việt:</strong>
+                                <p id="ex-vn-display" class="small text-secondary m-0">Bản dịch nghĩa</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-3 p-2 bg-white rounded-pill shadow-sm d-flex align-items-center gap-2 border" style="border-color: #ffd1dc !important;">
+        <button class="btn btn-cute text-white" style="background-color: #3b4e85;" onclick="prevCard()"><i class="bi bi-chevron-left"></i> Trước</button>
+        
+        <button id="mark-status-btn" class="btn btn-cute fw-bold" onclick="toggleMemorizedOnCard()">
+            Đánh dấu trạng thái
+        </button>
+        
+        <span id="card-index" class="fw-bold px-3 py-1 rounded-pill text-white" style="background-color: #a0aec0; font-size: 1.1rem;">0 / 0</span>
+        
+        <button class="btn btn-cute text-white" style="background-color: #3b4e85;" onclick="nextCard()">Tiếp <i class="bi bi-chevron-right"></i></button>
+    </div>
+    
+    <div class="mt-4">
+        <a href="/word?lang={{ lang }}" class="btn btn-cute btn-outline-secondary">
+            <i class="bi bi-arrow-left-short"></i> Trở về bảng từ vựng {{ lang }}
+        </a>
+    </div>
+</div>
+
+<div id="flashcard-data" style="display: none;">
+    [
+        {% for w in word %}
+            {
+                "id": {{ w.id }},
+                "word": "{{ w.word }}",
+                "pronunciation": "{{ w.pronunciation if w.pronunciation else '' }}",
+                "word_type": "{{ w.word_type if w.word_type else '' }}",
+                "meaning": "{{ w.meaning }}",
+                "ex_foreign": "{{ w.example_foreign if w.example_foreign else '' }}",
+                "ex_vn": "{{ w.example_vietnamese if w.example_vietnamese else '' }}",
+                "is_memorized": {{ 'true' if w.is_memorized else 'false' }}
+            }{% if not loop.last %},{% endif %}
+        {% endfor %}
+    ]
+</div>
+
+<style>
+.flashcard-container { perspective: 1000px; width: 100%; max-width: 520px; height: 320px; cursor: pointer; }
+.flashcard-inner { position: relative; width: 100%; height: 100%; text-align: center; transition: transform 0.5s; transform-style: preserve-3d; }
+.flashcard-container.flipped .flashcard-inner { transform: rotateY(180deg); }
+.flashcard-front, .flashcard-back { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; border-radius: 30px !important; }
+.flashcard-back { transform: rotateY(180deg); }
+</style>
+
+<script>
+    const dataText = document.getElementById('flashcard-data').innerText.trim();
+    const cards = dataText ? JSON.parse(dataText) : [];
+    let currentIndex = 0;
+    const container = document.querySelector('.flashcard-container');
+
+    function updateCard() {
+        container.classList.remove('flipped');
+        setTimeout(() => {
+            if (cards.length > 0) {
+                const current = cards[currentIndex];
+                document.getElementById('word-display').innerText = current.word;
+                document.getElementById('pron-display').innerText = current.pronunciation ? current.pronunciation : '';
+                document.getElementById('card-type').innerText = current.word_type ? current.word_type : 'Chưa loại';
+                document.getElementById('meaning-display').innerText = current.meaning;
+                document.getElementById('ex-foreign-display').innerText = current.ex_foreign ? current.ex_foreign : '(Trống)';
+                document.getElementById('ex-vn-display').innerText = current.ex_vn ? current.ex_vn : '(Trống)';
+                document.getElementById('card-index').innerText = `${currentIndex + 1} / ${cards.length}`;
+                
+                const statusBtn = document.getElementById('mark-status-btn');
+                if(current.is_memorized) {
+                    statusBtn.style.backgroundColor = "#79d279";
+                    statusBtn.style.color = "#ffffff";
+                    statusBtn.innerHTML = "✔️ Đã thuộc bài";
+                } else {
+                    // 5) Đổi màu nút chưa thuộc thành màu vàng chanh (#f5f878) kèm chữ đen cho dễ nhìn
+                    statusBtn.style.backgroundColor = "#f5f878";
+                    statusBtn.style.color = "#000000";
+                    statusBtn.innerHTML = "❌ Chưa thuộc";
+                }
+            }
+        }, 150);
+    }
+
+    function toggleMemorizedOnCard() {
+        if (cards.length === 0) return;
+        const current = cards[currentIndex];
+        fetch(`/toggle_memorized/${current.id}`, { method: 'POST' })
+        .then(response => response.json())
+        .then(data => {
+            if(data.status === 'success') {
+                cards[currentIndex].is_memorized = data.is_memorized;
+                updateCard();
+            }
+        });
+    }
+
+    function nextCard() { if (currentIndex < cards.length - 1) { currentIndex++; updateCard(); } }
+    function prevCard() { if (currentIndex > 0) { currentIndex--; updateCard(); } }
+    if (cards.length > 0) updateCard();
+</script>
+{% endblock %}

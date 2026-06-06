@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="main-card mx-auto text-center" style="max-width: 550px;">
+    <div class="mb-3">
+        <i class="bi bi-person-circle" style="font-size: 5rem; color: #ff6ca1;"></i>
+    </div>
+    <h2 class="fst-italic mb-2" style="color: #3b4e85; font-family: 'Georgia', serif;">Xin chào, {{ user.username }}!</h2>
+    <p class="text-muted fs-5 mb-4">Chào mừng bạn quay trở lại hệ thống học từ vựng.</p>
+    
+    <div class="card border-0 shadow-sm rounded-4 p-4 mx-auto mb-4" style="background-color: #ffffff; max-width: 420px;">
+        <div class="d-flex justify-content-between align-items-center mb-3 fs-5">
+            <span class="text-secondary">Email:</span>
+            <span class="fw-bold" style="color: #3b4e85;">{{ user.email }}</span>
+        </div>
+        <div class="d-flex justify-content-between align-items-center fs-5">
+            <span class="text-secondary">Chức vụ hệ thống:</span>
+            {% if user.role == 'admin' %}
+                <span class="badge rounded-pill pt-2 px-3 pb-1 text-white text-uppercase" style="background-color: #ff6ca1; font-size: 0.85rem; letter-spacing: 1px;">
+                    {{ user.role }}
+                </span>
+            {% else %}
+                <span class="badge rounded-pill pt-2 px-3 pb-1 text-white text-uppercase" style="background-color: #79d279; font-size: 0.85rem; letter-spacing: 1px;">
+                    {{ user.role }}
+                </span>
+            {% endif %}
+        </div>
+    </div>
+    
+    <a href="/word" class="btn btn-cute text-white shadow-sm fs-5" style="background-color: #5369b2;">
+        <i class="bi bi-folder-symlink-fill"></i> Khám phá kho từ vựng
+    </a>
+</div>
+{% endblock %}
