@@ -8,7 +8,7 @@ pip install flask flask-sqlalchemy
 
 2. Chạy ứng dụng:
 
-Python app.py 
+python app.py 
 
 
 # NWpacd Vocabulary
